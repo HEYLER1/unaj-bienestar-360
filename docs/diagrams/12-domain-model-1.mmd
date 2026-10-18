@@ -1,0 +1,17 @@
+erDiagram
+ USERS ||--o{ SESSIONS : tiene
+ USERS ||--o{ BOOKINGS : solicita
+ RESOURCES ||--o{ BOOKINGS : admite
+ USERS ||--o{ AUDIT_LOGS : origina
+ QUALITY_ACTIONS {
+  string id PK
+  string status
+  string evidence
+ }
+ WASTE_RECORDS {
+  string id PK
+  int prepared
+  int delivered
+  float recoverable
+  float waste
+ }

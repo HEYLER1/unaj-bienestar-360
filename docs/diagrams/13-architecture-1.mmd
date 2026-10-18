@@ -1,0 +1,8 @@
+flowchart LR
+ B[Navegador React] --> H[Route Handlers]
+ H --> A[Autenticación y autorización]
+ A --> S[Servicios de aplicación]
+ S --> D[Reglas de dominio]
+ S --> R[Repositorio SQL]
+ R --> L[(SQLite local)]
+ R -. destino pendiente .-> P[(PostgreSQL y Supabase)]

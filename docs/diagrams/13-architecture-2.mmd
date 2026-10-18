@@ -1,0 +1,12 @@
+sequenceDiagram
+ participant U as Estudiante
+ participant API as API autenticada
+ participant S as Servicio
+ participant DB as SQLite
+ U->>API: reservar + UUID
+ API->>S: actor confiable + entrada validada
+ S->>DB: BEGIN IMMEDIATE
+ S->>DB: validar idempotencia, cupo y conflictos
+ S->>DB: insertar reserva y auditoría
+ S->>DB: COMMIT
+ S-->>U: reserva confirmada

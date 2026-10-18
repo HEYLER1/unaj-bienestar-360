@@ -1,0 +1,11 @@
+flowchart LR
+ A[Sesión estudiantil] --> B[Servicio y horario]
+ B --> C{Permiso, fecha y cupo}
+ C -->|Válidos| D[Reserva y auditoría atómicas]
+ C -->|Inválidos| E[Error comprensible]
+ D --> F{Operación autorizada}
+ F --> G[Cancelar y liberar cupo]
+ F --> H[Verificar código y fecha]
+ H --> I[Espera y atención]
+ I --> J[Finalizar]
+ J --> K[Medir y mejorar]
