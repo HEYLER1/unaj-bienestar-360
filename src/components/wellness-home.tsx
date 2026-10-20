@@ -43,12 +43,12 @@ export function WellnessHome({
             Elige lo que necesitas. Nosotros te acompañamos.
           </p>
           <button className="easy-cta" onClick={() => onNavigate("services")}>
-            {student ? "Reservar un servicio" : "Explorar servicios"}
+            {student ? "Acceder a servicios" : "Explorar servicios"}
             <ArrowRight size={20} />
           </button>
           <div className="easy-hero-foot">
             <ShieldCheck size={15} />
-            Un espacio privado para cuidarte
+            Plataforma para la gestión de servicios de Bienestar Universitario
           </div>
         </div>
         <div className="easy-visual" aria-hidden="true">
@@ -67,19 +67,19 @@ export function WellnessHome({
           <i className="easy-star">✦</i>
         </div>
       </section>
-      <section className="easy-next" aria-label="Tu próxima reserva">
+      <section className="easy-next" aria-label="Tu próxima actividad">
         <span className="easy-next-icon">
           <CalendarDays size={25} />
         </span>
         <div>
           <span className="easy-overline">
-            {next ? "TU PRÓXIMA RESERVA" : "TU AGENDA, EN UN SOLO LUGAR"}
+            {next ? "TU PRÓXIMA CITA O SERVICIO" : "SERVICIOS UNIVERSITARIOS"}
           </span>
           <h3>{next?.title ?? "¿Listo para dar el primer paso?"}</h3>
           <p>
             {next
               ? `${next.date && new Date(next.date + "T12:00:00").toLocaleDateString("es-PE", { day: "numeric", month: "long" })} · ${next.time}`
-              : "Reserva un servicio y encuentra aquí tu próxima actividad."}
+              : "Consulta tus servicios, accede al comedor o solicita orientación aquí."}
           </p>
         </div>
         <button
@@ -89,7 +89,7 @@ export function WellnessHome({
           {next ? (
             <>
               <Ticket size={17} />
-              Ver mi QR
+              Ver mi ticket
             </>
           ) : (
             <>
@@ -103,7 +103,7 @@ export function WellnessHome({
         <div className="section-heading">
           <div>
             <h2>¿Qué necesitas hoy?</h2>
-            <p>Elige un servicio para ver horarios y reservar.</p>
+            <p>Procesos adaptados a cada servicio de Bienestar Universitario.</p>
           </div>
         </div>
         <ServiceCatalog onSelect={onNavigate} />
