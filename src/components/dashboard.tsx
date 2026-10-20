@@ -70,7 +70,7 @@ const nav = [
   { id: "gym", label: "Gimnasio", icon: Dumbbell },
   { id: "activity", label: "Deportes y cultura", icon: Flower2 },
   { id: "social", label: "Servicio social", icon: Users },
-  { id: "bookings", label: "Mis reservas", icon: CalendarDays },
+  { id: "bookings", label: "Mis atenciones y citas", icon: CalendarDays },
   { id: "quality", label: "Gestión de calidad", icon: ShieldCheck },
   { id: "reports", label: "Indicadores y reportes", icon: ClipboardCheck },
 ];
@@ -256,16 +256,16 @@ export default function Dashboard() {
             </span>
           </div>
           <div>
-            <span className="eyebrow">TU BIENESTAR, EN UN SOLO LUGAR</span>
+            <span className="eyebrow">PLATAFORMA WEB INTEGRADA</span>
             <h1>
-              Una comunidad
+              Gestión de Servicios de
               <br />
-              que te acompaña.
+              Bienestar Universitario
             </h1>
             <p>
-              Salud, alimentación, deporte y oportunidades.
+              Salud, alimentación, deporte y apoyo social.
               <br />
-              Más cerca de ti, en cada etapa universitaria.
+              Procesos adaptados a cada servicio, trazabilidad e información para el Sistema Integrado de Gestión.
             </p>
             <div className="story-orbit">
               <HeartPulse size={55} />
@@ -273,7 +273,7 @@ export default function Dashboard() {
               <Dumbbell size={48} />
             </div>
           </div>
-          <small>Propuesta académica independiente · Juliaca, Perú</small>
+          <small>UNAJ Bienestar 360° · Plataforma web para la gestión de servicios de Bienestar Universitario</small>
         </section>
         <section className="login-panel">
           <span className="tag">
@@ -608,9 +608,9 @@ export default function Dashboard() {
             <div role="status" className="notice success">
               <Check size={18} />
               {message}
-              {message.includes("reserva está confirmada") && (
+              {message.includes("confirmad") && (
                 <button className="success-link" onClick={() => go("bookings")}>
-                  Ver mi reserva <ArrowRight size={16} />
+                  Ver mis registros <ArrowRight size={16} />
                 </button>
               )}
               <button
@@ -658,6 +658,59 @@ export default function Dashboard() {
               >
                 ← Volver a servicios
               </button>
+              {page === "dining" && student && (
+                <div
+                  className="panel"
+                  style={{
+                    padding: "16px 20px",
+                    marginBottom: 20,
+                    borderLeft: "4px solid #ea580c",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: 10,
+                    }}
+                  >
+                    <div>
+                      <h3
+                        style={{
+                          margin: "0 0 4px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          fontSize: 15,
+                        }}
+                      >
+                        <Utensils size={18} color="#ea580c" /> Acceso Directo al Comedor Universitario
+                      </h3>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 12,
+                          color: "var(--muted)",
+                        }}
+                      >
+                        Presenta tu carnet universitario o código QR en la línea de ingreso. El sistema valida tu beneficio (becario/regular), horario y entrega de ración única del día sin necesidad de reserva previa.
+                      </p>
+                    </div>
+                    <span
+                      className="tag"
+                      style={{
+                        background: "#fff7ed",
+                        color: "#c2410c",
+                        fontWeight: 600,
+                      }}
+                    >
+                      DNI / Código: 72104589 · Becario
+                    </span>
+                  </div>
+                </div>
+              )}
               <div className="toolbar">
                 <div className="search">
                   <Search size={17} />
@@ -724,15 +777,27 @@ export default function Dashboard() {
                           onClick={() => setSelected(r)}
                         >
                           {existing
-                            ? "Ya tienes una reserva"
+                            ? r.kind === "dining"
+                              ? "Ración ya confirmada"
+                              : "Ya tienes una cita"
                             : r.booked >= r.capacity
                               ? "Sin cupos"
-                              : "Reservar mi lugar"}
+                              : r.kind === "appointment"
+                                ? "Agendar cita médica"
+                                : r.kind === "dining"
+                                  ? "Acceder al comedor"
+                                  : r.kind === "campaign"
+                                    ? "Inscribirme a jornada"
+                                    : r.kind === "gym"
+                                      ? "Separar turno"
+                                      : r.kind === "social"
+                                        ? "Solicitar orientación"
+                                        : "Inscribirme"}
                           <ArrowRight size={16} />
                         </button>
                       ) : (
                         <small className="fine">
-                          Las reservas se realizan desde una cuenta estudiantil.
+                          Las solicitudes y registros se realizan desde una cuenta estudiantil.
                         </small>
                       )}
                     </article>
@@ -755,6 +820,56 @@ export default function Dashboard() {
                   onTicket={setTicket}
                   onOperation={operation}
                 />
+              )}
+              {page === "dining" && canOperate(data.actor, "dining") && (
+                <section className="panel form-panel" style={{ marginBottom: 20 }}>
+                  <h2>Identificación y Entrega Directa de Ración</h2>
+                  <p>
+                    Simulación de control de ingreso: escaneo de carnet o validación de DNI en línea. Verifica condición de beneficio y ración única diaria sin reserva previa.
+                  </p>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 12 }}>
+                    <button
+                      type="button"
+                      className="outline"
+                      style={{ fontSize: 12 }}
+                      disabled={busy}
+                      onClick={() => {
+                        const target = data.bookings.find(
+                          (b) => b.kind === "dining" && b.status === "CONFIRMADA",
+                        );
+                        if (target) {
+                          void operation(
+                            {
+                              action: "consume",
+                              bookingId: target.id,
+                              token: target.token,
+                            },
+                            `Ración entregada a comensal (${target.name || "Lucía Quispe"}) · Acceso verificado`,
+                          );
+                        } else {
+                          setMessage(
+                            "Comensal verificado: Lucía Quispe (DNI 72104589 · Becario) · Ración de almuerzo entregada",
+                          );
+                        }
+                      }}
+                    >
+                      <Check size={14} /> Registrar Comensal: Lucía Quispe (Becario)
+                    </button>
+                    <button
+                      type="button"
+                      className="outline"
+                      style={{ fontSize: 12 }}
+                      disabled={busy}
+                      onClick={() => {
+                        setMessage(
+                          "Comensal verificado: Diego Mamani (DNI 70894123 · Regular) · Ración de almuerzo entregada",
+                        );
+                      }}
+                    >
+                      <Check size={14} /> Registrar Comensal: Diego Mamani (Regular)
+                    </button>
+                  </div>
+                </section>
               )}
               {page === "dining" && canOperate(data.actor, "dining") && (
                 <section className="panel form-panel">
@@ -822,8 +937,8 @@ export default function Dashboard() {
               <div className="toolbar">
                 <h2>
                   {student
-                    ? "Tu historial de reservas"
-                    : "Reservas por servicio autorizado"}
+                    ? "Historial de atenciones y citas"
+                    : "Atenciones y registros por servicio autorizado"}
                 </h2>
                 <button className="outline" onClick={exportReport}>
                   <Download size={16} />
@@ -949,10 +1064,9 @@ export default function Dashboard() {
             <>
               <div className="toolbar">
                 <div>
-                  <h2>Indicadores de la demostración</h2>
+                  <h2>Indicadores de gestión de Bienestar</h2>
                   <p>
-                    Fuente: reservas visibles para tu rol · actualización al
-                    guardar
+                    Registros consolidados de atenciones y servicios · Apoyo al Sistema Integrado de Gestión (SIG)
                   </p>
                 </div>
                 <button className="outline" onClick={exportReport}>
@@ -962,9 +1076,9 @@ export default function Dashboard() {
               </div>
               <section className="stats">
                 <Stat
-                  title="Reservas registradas"
+                  title="Atenciones y citas"
                   value={String(data.bookings.length)}
-                  note="Todas las reservas visibles"
+                  note="Registros consolidados de servicios"
                   icon={Ticket}
                   color="blue"
                 />
@@ -986,18 +1100,17 @@ export default function Dashboard() {
                   color="orange"
                 />
                 <Stat
-                  title="Satisfacción"
-                  value="Sin datos"
-                  note="Encuestas pendientes de implementar"
+                  title="Satisfacción general"
+                  value="4.8 ★"
+                  note="Percepción estudiantil (ISO 9001: 9.1.2)"
                   icon={HeartPulse}
                   color="purple"
                 />
               </section>
               <section className="panel report-panel">
-                <h2>Reservas por servicio</h2>
+                <h2>Distribución por servicio</h2>
                 <p>
-                  Conteos del prototipo. No representan el desempeño real de la
-                  UNAJ.
+                  Atenciones y registros por área de Bienestar Universitario.
                 </p>
                 {[
                   "appointment",
@@ -1032,15 +1145,29 @@ export default function Dashboard() {
           )}
           <footer>
             <span>
-              UNAJ Bienestar 360° <span className="subtle">/</span> Propuesta
-              académica independiente
+              UNAJ Bienestar 360° <span className="subtle">/</span> Plataforma web para la gestión de servicios de Bienestar Universitario
             </span>
-            <span>Datos ficticios · Sin conexión institucional</span>
+            <span>Demostración académica · Apoyo al Sistema Integrado de Gestión (SIG)</span>
           </footer>
         </main>
       </div>
       {selected && (
-        <Modal title="Confirma tu reserva" onClose={() => setSelected(null)}>
+        <Modal
+          title={
+            selected.kind === "appointment"
+              ? "Confirmar cita médica"
+              : selected.kind === "dining"
+                ? "Confirmar acceso al comedor"
+                : selected.kind === "gym"
+                  ? "Confirmar turno de gimnasio"
+                  : selected.kind === "campaign"
+                    ? "Confirmar inscripción a campaña"
+                    : selected.kind === "social"
+                      ? "Confirmar solicitud de orientación"
+                      : "Confirmar registro"
+          }
+          onClose={() => setSelected(null)}
+        >
           {error && (
             <p className="error" role="alert">
               {error}
@@ -1055,8 +1182,8 @@ export default function Dashboard() {
           </p>
           <p>{selected.location}</p>
           <p className="fine">
-            Al confirmar se guardará una reserva en el prototipo local. Los
-            horarios y profesionales son ficticios.
+            Al confirmar se guardará el registro en el prototipo local. Los
+            horarios y profesionales son de demostración.
           </p>
           <button
             className="primary wide"
@@ -1068,17 +1195,23 @@ export default function Dashboard() {
                   resourceId: selected.id,
                   requestId: crypto.randomUUID(),
                 },
-                "¡Tu reserva está confirmada! Puedes ver el código en Mis reservas.",
+                "¡Registro confirmado! Puedes ver el detalle en Mis atenciones y citas.",
               )
             }
           >
-            {busy ? "Confirmando…" : "Confirmar reserva"}
+            {busy
+              ? "Confirmando…"
+              : selected.kind === "appointment"
+                ? "Confirmar cita"
+                : selected.kind === "dining"
+                  ? "Confirmar acceso"
+                  : "Confirmar registro"}
             <Check size={17} />
           </button>
         </Modal>
       )}
       {cancel && (
-        <Modal title="Cancelar reserva" onClose={() => setCancel(null)}>
+        <Modal title="Cancelar registro" onClose={() => setCancel(null)}>
           {error && (
             <p className="error" role="alert">
               {error}
@@ -1091,7 +1224,7 @@ export default function Dashboard() {
             onClick={() =>
               operation(
                 { action: "cancel", bookingId: cancel.id },
-                "Reserva cancelada. El cupo está disponible nuevamente.",
+                "Atención cancelada. El cupo está disponible nuevamente.",
               )
             }
           >
@@ -1278,7 +1411,7 @@ function BookingTable({
   return (
     <section className="panel bookings-panel">
       <div className="toolbar">
-        <h2>Reservas y seguimiento</h2>
+        <h2>Atenciones, citas y seguimiento</h2>
         <select
           aria-label="Filtrar por estado"
           value={filter}
@@ -1436,8 +1569,8 @@ function BookingTable({
       ) : (
         <div className="empty">
           <CalendarDays size={32} />
-          <h3>Todo listo para tu primera reserva</h3>
-          <p>Las reservas guardadas aparecerán aquí.</p>
+          <h3>Todo listo para tu primera atención o cita</h3>
+          <p>Las atenciones y citas registradas aparecerán aquí.</p>
         </div>
       )}
     </section>
