@@ -1,0 +1,24 @@
+{
+  "formato": "APA 7",
+  "manual_paginas": 23,
+  "informe_paginas": 17,
+  "margenes_cm": 2.54,
+  "fuente": "Arial 11",
+  "interlineado_cuerpo": 2,
+  "tablas": {
+    "manual": 3,
+    "informe": 5,
+    "celdas": "Arial 10, interlineado sencillo permitido para legibilidad",
+    "bordes": "Horizontales; sin bordes verticales ni relleno"
+  },
+  "figuras": {
+    "manual": 15,
+    "informe": 3
+  },
+  "indice": "Comprobado contra la paginación PDF final",
+  "referencias": "Orden alfabético, títulos en cursiva y sangría francesa de 1.27 cm",
+  "portadas": "Autor e instructor pendientes de datos del usuario",
+  "diapositivas": 15,
+  "capturas": 25,
+  "revision_visual": "40 páginas finales inspeccionadas; sin páginas vacías; tablas legibles e índices verificados"
+}

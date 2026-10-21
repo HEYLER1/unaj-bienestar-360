@@ -1,6 +1,8 @@
 # Reglas del proyecto
 
-- Proyecto académico independiente; nunca afirmar oficialidad UNAJ ni certificación ISO.
+- El informe académico y el manual de usuario deben mantener APA 7 en cada versión: portada, márgenes, fuente, interlineado, sangrías, encabezados, paginación, tablas, figuras, citas y referencias. Tablas sin rellenos ni bordes verticales, con número, título y notas; referencias alfabéticas con sangría francesa. Regenerar Word y PDF y verificar visualmente su paginación antes de entregar.
+
+- El objetivo indicado por el usuario es evolucionar a una aplicación de uso real, con reservas y atención operativas; no conformarse con pantallas de demostración. No afirmar oficialidad UNAJ, certificación ISO, preparación para producción o integración física mientras no estén verificadas.
 - Leer docs/04-scope.md y docs/20-development-roadmap.md antes de ampliar funcionalidades.
 - Solo identidades y datos ficticios. No conectar servicios institucionales, publicar, generar costos ni ejecutar migraciones destructivas sin autorización.
 - Monolito modular: UI → Route Handlers → aplicación → dominio → repositorio. Validar siempre en servidor.

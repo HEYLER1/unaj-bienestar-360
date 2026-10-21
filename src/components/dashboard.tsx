@@ -1,6 +1,10 @@
 "use client";
 import { WellnessHome } from "./wellness-home";
 import { ServiceCatalog } from "./service-catalog";
+import { GymAccessPanel } from "./gym-access-panel";
+import { AppointmentSchedule } from "./appointment-schedule";
+import { RescheduleForm } from "./reschedule-form";
+import { GymPass } from "./gym-pass";
 import { ReservationQR } from "./reservation-qr";
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import {
@@ -32,6 +36,10 @@ import {
   Download,
   Plus,
   AlertCircle,
+  Mail,
+  LockKeyhole,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import type { Actor, Resource, Booking, Kind } from "@/domain/rules";
 import { canOperate } from "@/domain/rules";
@@ -107,6 +115,7 @@ function prettyDate(date: string) {
   });
 }
 export default function Dashboard() {
+  const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState<State | null>(null),
     [loading, setLoading] = useState(true),
     [page, setPage] = useState("overview"),
@@ -117,6 +126,7 @@ export default function Dashboard() {
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
     [selected, setSelected] = useState<Resource | null>(null),
+    [reschedule, setReschedule] = useState<Booking | null>(null),
     [ticket, setTicket] = useState<Booking | null>(null),
     [cancel, setCancel] = useState<Booking | null>(null),
     [qualityForm, setQualityForm] = useState(false),
@@ -204,6 +214,22 @@ export default function Dashboard() {
       setCancel(null);
       setQualityForm(false);
       await refresh();
+      const action = (body as { action?: string }).action;
+      if (action === "reserve" || action === "reschedule") {
+        const booking = result.result as Booking;
+        const resource = data?.resources.find(
+          (r) => r.id === booking.resource_id,
+        );
+        setReschedule(null);
+        if (resource)
+          setTicket({
+            ...booking,
+            title: resource.title,
+            kind: resource.kind,
+            date: resource.date,
+            time: resource.time,
+          });
+      }
       return true;
     } catch (e) {
       setError(
@@ -246,62 +272,141 @@ export default function Dashboard() {
   if (!data)
     return (
       <main className="login-page">
-        <section className="login-story">
-          <div className="brand">
-            <div className="brand-mark">
-              <GraduationCap />
-            </div>
-            <span>
-              UNAJ <b>Bienestar 360°</b>
+        <section className="login-story" aria-label="Bienestar universitario">
+          <div className="login-story-top">
+            <span className="login-location">
+              <MapPin size={15} /> Juliaca, Perú
             </span>
+            <span className="login-edition">BIENESTAR UNIVERSITARIO</span>
           </div>
-          <div>
-            <span className="eyebrow">TU BIENESTAR, EN UN SOLO LUGAR</span>
+          <div className="login-story-copy">
+            <span className="login-kicker">
+              <span /> CERCA DE TI, CADA DÍA
+            </span>
             <h1>
-              Una comunidad
+              Tu vida universitaria.
               <br />
-              que te acompaña.
+              <em>Con más bienestar.</em>
             </h1>
             <p>
-              Salud, alimentación, deporte y oportunidades.
-              <br />
-              Más cerca de ti, en cada etapa universitaria.
+              Un espacio para cuidarte, encontrar tu equilibrio
+              <br className="login-desktop-break" /> y disfrutar de todo lo que
+              viene.
             </p>
-            <div className="story-orbit">
-              <HeartPulse size={55} />
-              <Flower2 size={110} />
-              <Dumbbell size={48} />
-            </div>
           </div>
-          <small>Propuesta académica independiente · Juliaca, Perú</small>
+          <div className="login-art" aria-hidden="true">
+            <div className="login-art-ring ring-one" />
+            <div className="login-art-ring ring-two" />
+            <div className="login-art-core">
+              <Flower2 strokeWidth={1.15} />
+              <span>Crece. Conecta. Cuídate.</span>
+            </div>
+            <div className="login-service-chip chip-health">
+              <span>
+                <HeartPulse size={22} />
+              </span>
+              <div>
+                <b>Siéntete bien</b>
+                <small>Salud y acompañamiento</small>
+              </div>
+            </div>
+            <div className="login-service-chip chip-food">
+              <span>
+                <Utensils size={22} />
+              </span>
+              <div>
+                <b>Recarga tu día</b>
+                <small>Comedor universitario</small>
+              </div>
+            </div>
+            <div className="login-service-chip chip-sport">
+              <span>
+                <Dumbbell size={22} />
+              </span>
+              <div>
+                <b>Encuentra tu ritmo</b>
+                <small>Deporte y movimiento</small>
+              </div>
+            </div>
+            <span className="login-art-spark spark-one">✦</span>
+            <span className="login-art-spark spark-two">✦</span>
+          </div>
+          <div className="login-story-bottom">
+            <span>Una comunidad que te acompaña.</span>
+            <span className="login-story-dots">
+              <i />
+              <i />
+              <i />
+            </span>
+          </div>
         </section>
         <section className="login-panel">
-          <span className="tag">
-            <span className="dot" /> ENTORNO DE DEMOSTRACIÓN
-          </span>
-          <h2>Bienvenido de nuevo</h2>
-          <p>Accede a tu espacio de bienestar universitario.</p>
+          <div className="login-identity">
+            <div className="login-identity-mark">
+              <GraduationCap size={29} strokeWidth={1.6} />
+            </div>
+            <div>
+              <strong>UNAJ</strong>
+              <span>Universidad Nacional de Juliaca</span>
+            </div>
+          </div>
+          <div className="login-welcome">
+            <span className="login-section-label">BIENESTAR 360°</span>
+            <h2>Qué bueno verte.</h2>
+            <p>Ingresa y conecta con tu bienestar.</p>
+          </div>
           <form onSubmit={handleSubmit(login)}>
             <label htmlFor="email">Correo electrónico</label>
-            <input
-              id="email"
-              autoComplete="username"
-              {...register("email")}
-              aria-invalid={!!errors.email}
-            />
+            <div className="login-input-wrap">
+              <Mail size={19} aria-hidden="true" />
+              <input
+                id="email"
+                type="email"
+                placeholder="tu.correo@demo.local"
+                spellCheck={false}
+                autoCapitalize="none"
+                autoComplete="username"
+                {...register("email")}
+                aria-invalid={!!errors.email}
+                aria-describedby={
+                  errors.email ? "login-email-error" : undefined
+                }
+              />
+            </div>
             {errors.email && (
-              <small className="error">{errors.email.message}</small>
+              <small id="login-email-error" className="error">
+                {errors.email.message}
+              </small>
             )}
             <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              {...register("password")}
-              aria-invalid={!!errors.password}
-            />
+            <div className="login-input-wrap">
+              <LockKeyhole size={19} aria-hidden="true" />
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                {...register("password")}
+                aria-invalid={!!errors.password}
+                aria-describedby={
+                  errors.password ? "login-password-error" : undefined
+                }
+              />
+              <button
+                className="login-password-toggle"
+                type="button"
+                aria-label={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
+                aria-pressed={showPassword}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+              </button>
+            </div>
             {errors.password && (
-              <small className="error">{errors.password.message}</small>
+              <small id="login-password-error" className="error">
+                {errors.password.message}
+              </small>
             )}
             {error && (
               <p role="alert" className="error">
@@ -314,17 +419,46 @@ export default function Dashboard() {
             </button>
           </form>
           <div className="demo-box">
-            <b>Explora con una cuenta ficticia</b>
+            <div className="login-demo-title">
+              <span className="dot" />
+              <b>Prueba la experiencia</b>
+              <span>DEMO</span>
+            </div>
             <div className="demo-choices">
               <button
-                onClick={() => setValue("email", "estudiante@demo.local")}
+                onClick={() => {
+                  setValue("email", "estudiante@demo.local", {
+                    shouldValidate: true,
+                  });
+                  setValue("password", "Demo360!2026", {
+                    shouldValidate: true,
+                  });
+                }}
               >
                 Estudiante
               </button>
-              <button onClick={() => setValue("email", "gestion@demo.local")}>
+              <button
+                onClick={() => {
+                  setValue("email", "gestion@demo.local", {
+                    shouldValidate: true,
+                  });
+                  setValue("password", "Demo360!2026", {
+                    shouldValidate: true,
+                  });
+                }}
+              >
                 Gestión
               </button>
-              <button onClick={() => setValue("email", "tecnico@demo.local")}>
+              <button
+                onClick={() => {
+                  setValue("email", "tecnico@demo.local", {
+                    shouldValidate: true,
+                  });
+                  setValue("password", "Demo360!2026", {
+                    shouldValidate: true,
+                  });
+                }}
+              >
                 Técnico
               </button>
             </div>
@@ -333,8 +467,8 @@ export default function Dashboard() {
             </small>
           </div>
           <p className="fine">
-            Cuentas preaprovisionadas para exposición. Sin registro público ni
-            recuperación por correo. No ingresar datos reales.
+            Propuesta académica independiente. Usa solo cuentas ficticias; no
+            ingreses credenciales institucionales.
           </p>
         </section>
       </main>
@@ -575,26 +709,43 @@ export default function Dashboard() {
             <span className="avatar small">{student ? "LQ" : "VF"}</span>
           </div>
         </header>
-        <main id="main" className="content">
-          <div className="page-title">
-            <div>
-              <span className="eyebrow">BIENESTAR UNIVERSITARIO</span>
-              <h1>
-                {page === "overview"
-                  ? `Hola, ${data.actor.name.split(" ")[0]} 👋`
-                  : nav.find((n) => n.id === page)?.label}
-              </h1>
-              <p>
-                {page === "overview"
-                  ? "Qué bueno verte. ¿Cómo podemos acompañarte hoy?"
-                  : "Organiza y consulta tus servicios en un solo lugar."}
-              </p>
+        <main
+          id="main"
+          className={
+            page === "overview" ? "content" : "content content-compact"
+          }
+        >
+          {page === "services" ? (
+            <h1 className="visually-hidden">Servicios</h1>
+          ) : (
+            <div
+              className={
+                page === "overview"
+                  ? "page-title"
+                  : "page-title page-title-compact"
+              }
+            >
+              <div>
+                {page === "overview" && (
+                  <span className="eyebrow">BIENESTAR UNIVERSITARIO</span>
+                )}
+                <h1>
+                  {page === "overview"
+                    ? `Hola, ${data.actor.name.split(" ")[0]} 👋`
+                    : nav.find((n) => n.id === page)?.label}
+                </h1>
+                {page === "overview" && (
+                  <p>Qué bueno verte. ¿Cómo podemos acompañarte hoy?</p>
+                )}
+              </div>
+              {page === "overview" && (
+                <span className="date-label">
+                  <CalendarDays size={16} />
+                  {today}
+                </span>
+              )}
             </div>
-            <span className="date-label">
-              <CalendarDays size={16} />
-              {today}
-            </span>
-          </div>
+          )}
           {error && (
             <div role="alert" className="notice error-notice">
               <AlertCircle size={18} />
@@ -640,7 +791,12 @@ export default function Dashboard() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <ServiceCatalog onSelect={go} search={search} />
+              <ServiceCatalog
+                showBookings
+                onSelect={go}
+                search={search}
+                onClearSearch={() => setSearch("")}
+              />
             </section>
           )}
           {[
@@ -658,6 +814,32 @@ export default function Dashboard() {
               >
                 ← Volver a servicios
               </button>
+              {page === "appointment" &&
+                !student &&
+                data.actor.roles.some((role) =>
+                  ["coordinator", "doctor", "psychologist"].includes(role),
+                ) && (
+                  <AppointmentSchedule
+                    resources={data.resources}
+                    onChange={refresh}
+                  />
+                )}
+              {page === "gym" && canOperate(data.actor, "gym") && (
+                <GymAccessPanel onChange={refresh} />
+              )}
+              {page === "gym" && student && (
+                <div className="gym-student-info panel">
+                  <ShieldCheck size={24} />
+                  <div>
+                    <b>Reserva tu horario. Lleva tu pase QR.</b>
+                    <p>
+                      Abre el código en Mis reservas al llegar. El pase dura 60
+                      segundos y se usa una sola vez; genera uno nuevo para
+                      registrar tu salida. Control de acceso simulado.
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="toolbar">
                 <div className="search">
                   <Search size={17} />
@@ -752,6 +934,10 @@ export default function Dashboard() {
                   actor={data.actor}
                   busy={busy}
                   onCancel={setCancel}
+                  onReschedule={(b) => {
+                    setError("");
+                    setReschedule(b);
+                  }}
                   onTicket={setTicket}
                   onOperation={operation}
                 />
@@ -835,6 +1021,10 @@ export default function Dashboard() {
                 actor={data.actor}
                 busy={busy}
                 onCancel={setCancel}
+                onReschedule={(b) => {
+                  setError("");
+                  setReschedule(b);
+                }}
                 onTicket={setTicket}
                 onOperation={operation}
               />
@@ -1055,8 +1245,9 @@ export default function Dashboard() {
           </p>
           <p>{selected.location}</p>
           <p className="fine">
-            Al confirmar se guardará una reserva en el prototipo local. Los
-            horarios y profesionales son ficticios.
+            Al confirmar se guardará tu reserva y se generará el pase
+            correspondiente. Podrás cambiar el horario desde Mis reservas, según
+            disponibilidad.
           </p>
           <button
             className="primary wide"
@@ -1075,6 +1266,30 @@ export default function Dashboard() {
             {busy ? "Confirmando…" : "Confirmar reserva"}
             <Check size={17} />
           </button>
+        </Modal>
+      )}
+      {reschedule && (
+        <Modal
+          title="Reprogramar mi reserva"
+          onClose={() => setReschedule(null)}
+        >
+          <RescheduleForm
+            booking={reschedule}
+            resources={data.resources}
+            busy={busy}
+            error={error}
+            onConfirm={(resourceId) =>
+              void operation(
+                {
+                  action: "reschedule",
+                  bookingId: reschedule.id,
+                  resourceId,
+                  requestId: crypto.randomUUID(),
+                },
+                "Reserva reprogramada. El código anterior dejó de ser válido.",
+              )
+            }
+          />
         </Modal>
       )}
       {cancel && (
@@ -1100,16 +1315,56 @@ export default function Dashboard() {
         </Modal>
       )}
       {ticket && (
-        <Modal title="Código de tu reserva" onClose={() => setTicket(null)}>
+        <Modal
+          title={
+            ticket.kind === "gym"
+              ? "Pase de acceso al gimnasio"
+              : ticket.kind === "appointment"
+                ? "Turno de atención confirmado"
+                : "Reserva confirmada"
+          }
+          onClose={() => setTicket(null)}
+        >
           <div className="ticket">
-            <ReservationQR id={ticket.id} token={ticket.token} />
-            <h3>{ticket.title}</h3>
+            <div className="appointment-pass-heading">
+              <span className="eyebrow">
+                {ticket.kind === "gym"
+                  ? "ACCESO AL GIMNASIO"
+                  : ticket.kind === "appointment"
+                    ? ticket.resource_id.startsWith("psy-")
+                      ? "ATENCIÓN PSICOLÓGICA"
+                      : "ATENCIÓN DE SALUD"
+                    : "TU RESERVA"}
+              </span>
+              <h3>{ticket.title}</h3>
+              <strong>{ticket.time}</strong>
+              <p>{ticket.date && prettyDate(ticket.date)}</p>
+              <small>Referencia: {ticket.id.slice(0, 8).toUpperCase()}</small>
+            </div>
+            {ticket.kind === "gym" ? (
+              ticket.user_id === data.actor.id ? (
+                <GymPass bookingId={ticket.id} />
+              ) : (
+                <p className="fine">
+                  El estudiante debe generar su pase temporal desde su cuenta.
+                  Valídalo en Control de acceso al gimnasio.
+                </p>
+              )
+            ) : (
+              <ReservationQR id={ticket.id} token={ticket.token} />
+            )}
             <p>
-              {ticket.date && prettyDate(ticket.date)} · {ticket.time}
+              {data.resources.find((r) => r.id === ticket.resource_id)?.staff}
+            </p>
+            <p>
+              {
+                data.resources.find((r) => r.id === ticket.resource_id)
+                  ?.location
+              }
             </p>
             <span className="tag">{labels[ticket.status]}</span>
-            <code>{ticket.token}</code>
-            <p className="fine">
+            {ticket.kind !== "gym" && <code>{ticket.token}</code>}
+            <p className="fine" hidden={ticket.kind === "gym"}>
               Presenta este QR al personal autorizado. También puedes utilizar
               el código de texto. El escaneo por cámara está pendiente.
             </p>
@@ -1264,6 +1519,7 @@ function BookingTable({
   actor,
   busy,
   onCancel,
+  onReschedule,
   onTicket,
   onOperation,
 }: {
@@ -1271,6 +1527,7 @@ function BookingTable({
   actor: Actor;
   busy: boolean;
   onCancel: (b: Booking) => void;
+  onReschedule: (b: Booking) => void;
   onTicket: (b: Booking) => void;
   onOperation: (body: object, success?: string) => Promise<boolean>;
 }) {
@@ -1336,6 +1593,17 @@ function BookingTable({
                         >
                           Ver código
                         </button>
+                        {b.status === "CONFIRMADA" &&
+                          b.user_id === actor.id &&
+                          actor.roles.includes("student") && (
+                            <button
+                              className="text-button"
+                              disabled={busy}
+                              onClick={() => onReschedule(b)}
+                            >
+                              Cambiar fecha y hora
+                            </button>
+                          )}
                         {["CONFIRMADA", "EN_ESPERA"].includes(b.status) &&
                           (b.user_id === actor.id ||
                             canOperate(actor, b.kind!)) && (
@@ -1347,85 +1615,89 @@ function BookingTable({
                               Cancelar
                             </button>
                           )}
-                        {b.kind && canOperate(actor, b.kind) && (
-                          <>
-                            {b.status === "CONFIRMADA" && (
-                              <button
-                                className="outline small-button"
-                                disabled={busy}
-                                onClick={() => {
-                                  const presented = window.prompt(
-                                    "Introduce el código o contenido QR presentado por el estudiante",
-                                  );
-                                  let token = presented;
-                                  if (presented?.trim().startsWith("{")) {
-                                    try {
-                                      const payload = JSON.parse(presented) as {
-                                        bookingId?: string;
-                                        token?: string;
-                                      };
-                                      token =
-                                        payload.bookingId === b.id &&
-                                        typeof payload.token === "string"
-                                          ? payload.token
-                                          : "invalid-qr";
-                                    } catch {
-                                      token = "invalid-qr";
+                        {b.kind &&
+                          b.kind !== "gym" &&
+                          canOperate(actor, b.kind) && (
+                            <>
+                              {b.status === "CONFIRMADA" && (
+                                <button
+                                  className="outline small-button"
+                                  disabled={busy}
+                                  onClick={() => {
+                                    const presented = window.prompt(
+                                      "Introduce el código o contenido QR presentado por el estudiante",
+                                    );
+                                    let token = presented;
+                                    if (presented?.trim().startsWith("{")) {
+                                      try {
+                                        const payload = JSON.parse(
+                                          presented,
+                                        ) as {
+                                          bookingId?: string;
+                                          token?: string;
+                                        };
+                                        token =
+                                          payload.bookingId === b.id &&
+                                          typeof payload.token === "string"
+                                            ? payload.token
+                                            : "invalid-qr";
+                                      } catch {
+                                        token = "invalid-qr";
+                                      }
                                     }
+                                    if (token)
+                                      void onOperation(
+                                        {
+                                          action:
+                                            b.kind === "dining"
+                                              ? "consume"
+                                              : "checkin",
+                                          bookingId: b.id,
+                                          token,
+                                        },
+                                        "Asistencia registrada",
+                                      );
+                                  }}
+                                >
+                                  {b.kind === "dining"
+                                    ? "Entregar ración"
+                                    : "Registrar llegada"}
+                                </button>
+                              )}
+                              {b.status === "EN_ESPERA" && (
+                                <button
+                                  className="outline small-button"
+                                  disabled={busy}
+                                  onClick={() =>
+                                    onOperation(
+                                      { action: "call", bookingId: b.id },
+                                      "Turno llamado",
+                                    )
                                   }
-                                  if (token)
-                                    void onOperation(
+                                >
+                                  Llamar turno
+                                </button>
+                              )}
+                              {b.status === "EN_ATENCION" && (
+                                <button
+                                  className="outline small-button"
+                                  disabled={busy}
+                                  onClick={() =>
+                                    onOperation(
                                       {
                                         action:
-                                          b.kind === "dining"
-                                            ? "consume"
-                                            : "checkin",
+                                          b.kind === "gym" ? "exit" : "finish",
                                         bookingId: b.id,
-                                        token,
                                       },
-                                      "Asistencia registrada",
-                                    );
-                                }}
-                              >
-                                {b.kind === "dining"
-                                  ? "Entregar ración"
-                                  : "Registrar llegada"}
-                              </button>
-                            )}
-                            {b.status === "EN_ESPERA" && (
-                              <button
-                                className="outline small-button"
-                                disabled={busy}
-                                onClick={() =>
-                                  onOperation(
-                                    { action: "call", bookingId: b.id },
-                                    "Turno llamado",
-                                  )
-                                }
-                              >
-                                Llamar turno
-                              </button>
-                            )}
-                            {b.status === "EN_ATENCION" && (
-                              <button
-                                className="outline small-button"
-                                disabled={busy}
-                                onClick={() =>
-                                  onOperation(
-                                    {
-                                      action:
-                                        b.kind === "gym" ? "exit" : "finish",
-                                      bookingId: b.id,
-                                    },
-                                    "Atención finalizada",
-                                  )
-                                }
-                              >
-                                Finalizar
-                              </button>
-                            )}
-                          </>
-                        )}
+                                      "Atención finalizada",
+                                    )
+                                  }
+                                >
+                                  Finalizar
+                                </button>
+                              )}
+                            </>
+                          )}
                       </div>
                     </td>
                   </tr>

@@ -1,0 +1,127 @@
+[
+  {
+    "id": "01-acceso",
+    "label": "Acceso con cuentas ficticias",
+    "file": "capturas/01-acceso.png"
+  },
+  {
+    "id": "02-inicio",
+    "label": "Inicio estudiantil y navegación simplificada",
+    "file": "capturas/02-inicio.png"
+  },
+  {
+    "id": "03-servicios",
+    "label": "Catálogo de seis servicios",
+    "file": "capturas/03-servicios.png"
+  },
+  {
+    "id": "04-horarios-salud",
+    "label": "Horarios y cupos de salud",
+    "file": "capturas/04-horarios-salud.png"
+  },
+  {
+    "id": "05-confirmacion",
+    "label": "Confirmación de una cita ficticia",
+    "file": "capturas/05-confirmacion.png"
+  },
+  {
+    "id": "06-reservas",
+    "label": "Reserva confirmada persistente",
+    "file": "capturas/06-reservas.png"
+  },
+  {
+    "id": "07-qr",
+    "label": "QR generado localmente",
+    "file": "capturas/07-qr.png"
+  },
+  {
+    "id": "08-cancelacion",
+    "label": "Cancelación y liberación del cupo",
+    "file": "capturas/08-cancelacion.png"
+  },
+  {
+    "id": "09-campana",
+    "label": "Inscripción con cupo de campaña",
+    "file": "capturas/09-campana.png"
+  },
+  {
+    "id": "10-comedor",
+    "label": "Menú y reserva de almuerzo",
+    "file": "capturas/10-comedor.png"
+  },
+  {
+    "id": "11-gimnasio",
+    "label": "Reserva de franja de gimnasio",
+    "file": "capturas/11-gimnasio.png"
+  },
+  {
+    "id": "12-social",
+    "label": "Orientación social sin expediente",
+    "file": "capturas/12-social.png"
+  },
+  {
+    "id": "13-campana-espera",
+    "label": "Registro de llegada y espera general",
+    "file": "capturas/13-campana-espera.png"
+  },
+  {
+    "id": "14-campana-atencion",
+    "label": "Llamada del turno y atención administrativa",
+    "file": "capturas/14-campana-atencion.png"
+  },
+  {
+    "id": "15-campana-finalizada",
+    "label": "Campaña finalizada sin estaciones clínicas",
+    "file": "capturas/15-campana-finalizada.png"
+  },
+  {
+    "id": "16-racion-entregada",
+    "label": "Entrega única de ración por código",
+    "file": "capturas/16-racion-entregada.png"
+  },
+  {
+    "id": "17-produccion",
+    "label": "Producción y residuos ficticios registrados manualmente",
+    "file": "capturas/17-produccion.png"
+  },
+  {
+    "id": "18-gimnasio-salida",
+    "label": "Finalización administrativa del turno de gimnasio",
+    "file": "capturas/18-gimnasio-salida.png"
+  },
+  {
+    "id": "19-calidad-formulario",
+    "label": "Creación de acción correctiva ficticia",
+    "file": "capturas/19-calidad-formulario.png"
+  },
+  {
+    "id": "20-calidad-verificacion",
+    "label": "Acción en verificación con evidencia de ejecución",
+    "file": "capturas/20-calidad-verificacion.png"
+  },
+  {
+    "id": "21-calidad-cierre",
+    "label": "Cierre del flujo con evidencia simulada",
+    "file": "capturas/21-calidad-cierre.png"
+  },
+  {
+    "id": "22-indicadores",
+    "label": "Conteos administrativos del escenario ficticio",
+    "file": "capturas/22-indicadores.png"
+  },
+  {
+    "id": "23-acceso-restringido",
+    "label": "Técnico sin permiso para gestionar calidad",
+    "file": "capturas/23-acceso-restringido.png"
+  },
+  {
+    "id": "24-movil",
+    "label": "Inicio móvil con accesos inferiores",
+    "file": "capturas/24-movil.png"
+  },
+  {
+    "id": "25-oscuro",
+    "label": "Modo oscuro móvil",
+    "file": "capturas/25-oscuro.png"
+  }
+]

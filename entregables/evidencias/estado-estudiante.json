@@ -1,0 +1,198 @@
+{
+  "actor": {
+    "id": "student",
+    "name": "Lucía Quispe · Demo",
+    "roles": [
+      "student"
+    ]
+  },
+  "resources": [
+    {
+      "id": "camp-1",
+      "kind": "campaign",
+      "title": "Jornada de bienestar integral",
+      "description": "Campaña ficticia. Estaciones propuestas: triaje, medicina y nutrición. Tiempo de espera aproximado.",
+      "date": "2026-10-19",
+      "time": "08:00",
+      "capacity": 40,
+      "location": "Patio central · Sede demo",
+      "staff": "Equipo de bienestar · Demo",
+      "booked": 1
+    },
+    {
+      "id": "med-1",
+      "kind": "appointment",
+      "title": "Medicina general",
+      "description": "Orientación y atención médica administrativa de demostración.",
+      "date": "2026-10-19",
+      "time": "09:00",
+      "capacity": 1,
+      "location": "Consultorio 01 · Sede demo",
+      "staff": "Dra. Ana Torres · Ficticia",
+      "booked": 0
+    },
+    {
+      "id": "med-2",
+      "kind": "appointment",
+      "title": "Medicina general",
+      "description": "Consulta programada de demostración.",
+      "date": "2026-10-19",
+      "time": "10:00",
+      "capacity": 1,
+      "location": "Consultorio 01 · Sede demo",
+      "staff": "Dra. Ana Torres · Ficticia",
+      "booked": 0
+    },
+    {
+      "id": "psy-1",
+      "kind": "appointment",
+      "title": "Acompañamiento psicológico",
+      "description": "Agenda privada; sin notas clínicas en este prototipo.",
+      "date": "2026-10-19",
+      "time": "11:00",
+      "capacity": 1,
+      "location": "Consultorio 02 · Sede demo",
+      "staff": "Psic. Elena Rojas · Ficticia",
+      "booked": 0
+    },
+    {
+      "id": "food-1",
+      "kind": "dining",
+      "title": "Almuerzo universitario",
+      "description": "Quinua con verduras, pollo al horno y fruta de estación. Menú ficticio.",
+      "date": "2026-10-19",
+      "time": "12:00",
+      "capacity": 80,
+      "location": "Comedor · Sede demo",
+      "staff": "Equipo de alimentación · Demo",
+      "booked": 1
+    },
+    {
+      "id": "social-1",
+      "kind": "social",
+      "title": "Orientación de apoyo estudiantil",
+      "description": "Solicitud administrativa ficticia. No adjuntar datos socioeconómicos reales.",
+      "date": "2026-10-19",
+      "time": "14:00",
+      "capacity": 10,
+      "location": "Servicio social · Sede demo",
+      "staff": "Equipo de servicio social · Demo",
+      "booked": 1
+    },
+    {
+      "id": "act-1",
+      "kind": "activity",
+      "title": "Taller de danzas del altiplano",
+      "description": "Actividad cultural propuesta; duración de 60 minutos.",
+      "date": "2026-10-19",
+      "time": "15:00",
+      "capacity": 25,
+      "location": "Sala cultural · Sede demo",
+      "staff": "Coordinación cultural · Demo",
+      "booked": 0
+    },
+    {
+      "id": "gym-1",
+      "kind": "gym",
+      "title": "Entrenamiento libre",
+      "description": "Turno de 60 minutos. Reserva y control de ingreso y salida.",
+      "date": "2026-10-19",
+      "time": "16:00",
+      "capacity": 15,
+      "location": "Gimnasio · Sede demo",
+      "staff": "Equipo deportivo · Demo",
+      "booked": 1
+    },
+    {
+      "id": "gym-2",
+      "kind": "gym",
+      "title": "Entrenamiento libre",
+      "description": "Turno de 60 minutos. Reserva y control de ingreso y salida.",
+      "date": "2026-10-19",
+      "time": "17:00",
+      "capacity": 15,
+      "location": "Gimnasio · Sede demo",
+      "staff": "Equipo deportivo · Demo",
+      "booked": 0
+    }
+  ],
+  "bookings": [
+    {
+      "id": "d8fe297d-a52c-4915-8cdb-133eff442198",
+      "resource_id": "med-1",
+      "user_id": "student",
+      "status": "CANCELADA",
+      "token": "ef6ba64abdb3e0342a53bda41d464606b82b9713",
+      "created_at": "2026-10-18T18:54:34.206Z",
+      "updated_at": "2026-10-18T18:54:34.982Z",
+      "request_id": "77a186c4-716d-49d0-bb56-1e3eac4c99b0",
+      "title": "Medicina general",
+      "kind": "appointment",
+      "date": "2026-10-19",
+      "time": "09:00",
+      "name": "Lucía Quispe · Demo"
+    },
+    {
+      "id": "d2a78d9b-6a74-4b27-8f78-b60d3b23e05f",
+      "resource_id": "camp-1",
+      "user_id": "student",
+      "status": "CONFIRMADA",
+      "token": "315aa123405a24dfa1a98b00c18538013437e33a",
+      "created_at": "2026-10-18T18:54:35.305Z",
+      "updated_at": "2026-10-18T18:54:35.305Z",
+      "request_id": "09ca3f4a-debb-42f3-8b73-9b5fcb230180",
+      "title": "Jornada de bienestar integral",
+      "kind": "campaign",
+      "date": "2026-10-19",
+      "time": "08:00",
+      "name": "Lucía Quispe · Demo"
+    },
+    {
+      "id": "920daa23-3793-4c3f-a1df-c7bfbf436de4",
+      "resource_id": "food-1",
+      "user_id": "student",
+      "status": "CONFIRMADA",
+      "token": "18f9298d66d0af4afda0d1e7e3ffaf06583c42f8",
+      "created_at": "2026-10-18T18:54:35.669Z",
+      "updated_at": "2026-10-18T18:54:35.669Z",
+      "request_id": "d4637d46-723a-4054-8fa5-8d25e8f31f86",
+      "title": "Almuerzo universitario",
+      "kind": "dining",
+      "date": "2026-10-19",
+      "time": "12:00",
+      "name": "Lucía Quispe · Demo"
+    },
+    {
+      "id": "70aa7b18-ce70-4130-8eed-0103140bc77c",
+      "resource_id": "gym-1",
+      "user_id": "student",
+      "status": "CONFIRMADA",
+      "token": "b45c04633dccdddaa7f3aac3f20f98cd43b2e99e",
+      "created_at": "2026-10-18T18:54:36.085Z",
+      "updated_at": "2026-10-18T18:54:36.085Z",
+      "request_id": "55b7badd-6d6b-4180-9f44-99a3b52ed212",
+      "title": "Entrenamiento libre",
+      "kind": "gym",
+      "date": "2026-10-19",
+      "time": "16:00",
+      "name": "Lucía Quispe · Demo"
+    },
+    {
+      "id": "eb429cf2-e9bf-4f18-99f9-4057ea87dbc4",
+      "resource_id": "social-1",
+      "user_id": "student",
+      "status": "CONFIRMADA",
+      "token": "c4da64c470d7019d480e6f08e82ffaeb98bda1ed",
+      "created_at": "2026-10-18T18:54:36.469Z",
+      "updated_at": "2026-10-18T18:54:36.469Z",
+      "request_id": "da2113bd-84d9-451c-b7f3-d3844b3dbc5d",
+      "title": "Orientación de apoyo estudiantil",
+      "kind": "social",
+      "date": "2026-10-19",
+      "time": "14:00",
+      "name": "Lucía Quispe · Demo"
+    }
+  ],
+  "quality": [],
+  "waste": []
+}

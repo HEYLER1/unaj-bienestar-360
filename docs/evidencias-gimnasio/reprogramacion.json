@@ -1,0 +1,11 @@
+{
+  "fecha": "2026-10-20",
+  "tests": 26,
+  "e2e": 8,
+  "caso_nuevo": "Reprogramación de atención y rechazo del QR anterior",
+  "datos_prueba": "Base aislada temporal",
+  "lint": "correcto",
+  "typecheck": "correcto",
+  "hardware": false,
+  "preparado_produccion": false
+}

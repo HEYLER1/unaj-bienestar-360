@@ -52,6 +52,12 @@ export const bookingSchema = z.object({
 export const operationSchema = z.discriminatedUnion("action", [
   bookingSchema,
   z.object({
+    action: z.literal("reschedule"),
+    bookingId: z.uuid(),
+    resourceId: z.string().min(1),
+    requestId: z.uuid(),
+  }),
+  z.object({
     action: z.enum([
       "cancel",
       "checkin",
@@ -143,4 +149,15 @@ export function canOperateResource(
     return actor.roles.includes(psychology ? "psychologist" : "doctor");
   }
   return canOperate(actor, resource.kind);
+}
+
+export function sameReservationService(
+  a: Pick<Resource, "id" | "kind">,
+  b: Pick<Resource, "id" | "kind">,
+) {
+  return (
+    a.kind === b.kind &&
+    (a.kind !== "appointment" ||
+      a.id.startsWith("psy-") === b.id.startsWith("psy-"))
+  );
 }

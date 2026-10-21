@@ -1,0 +1,22 @@
+{
+  "fecha": "2026-10-20",
+  "tests": 19,
+  "e2e_regresion": 7,
+  "lint": "correcto",
+  "typecheck": "correcto",
+  "build": "correcto --webpack",
+  "qr_navegador": {
+    "ingreso": true,
+    "reutilizacion_rechazada": true,
+    "salida": true,
+    "aforo_final": 0,
+    "eventos": 2,
+    "anonimo_bloqueado": true,
+    "errores_js": []
+  },
+  "creacion_horario_ui": true,
+  "movil_sin_desbordamiento": true,
+  "hardware_conectado": false,
+  "camara_fisica_verificada": false,
+  "base_qa": "temporal aislada"
+}

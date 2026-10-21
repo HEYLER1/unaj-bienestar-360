@@ -33,6 +33,10 @@ test("reserva, recarga y cancela de extremo a extremo", async ({ page }) => {
   await page
     .getByRole("button", { name: "Confirmar reserva", exact: true })
     .click();
+  await expect(
+    page.getByRole("dialog", { name: "Turno de atención confirmado" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Cerrar diálogo" }).click();
   await expect(page.getByRole("status")).toContainText("confirmada");
   await page.reload();
   await expect(page.getByRole("heading", { name: /Hola,/ })).toBeVisible();

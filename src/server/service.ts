@@ -1,6 +1,7 @@
 import { randomUUID, randomBytes } from "node:crypto";
 import {
   operationSchema,
+  sameReservationService,
   canOperate,
   canOperateResource,
   nextStatus,
@@ -68,6 +69,77 @@ export function operate(actor: Actor, input: unknown) {
       audit(actor, "reserve", id);
       return getBooking(id);
     }
+    if (op.action === "reschedule") {
+      const b = getBooking(op.bookingId);
+      if (!b || b.user_id !== actor.id || !actor.roles.includes("student"))
+        throw new Error("No puedes reprogramar una reserva ajena");
+      const repeated = db
+        .prepare("SELECT * FROM booking_changes WHERE request_id=?")
+        .get(op.requestId) as
+        | { booking_id: string; user_id: string; to_resource: string }
+        | undefined;
+      if (repeated) {
+        if (
+          repeated.booking_id !== b.id ||
+          repeated.user_id !== actor.id ||
+          repeated.to_resource !== op.resourceId
+        )
+          throw new Error("Solicitud no autorizada");
+        return b;
+      }
+      if (b.status !== "CONFIRMADA")
+        throw new Error(
+          "Solo puedes reprogramar reservas confirmadas sin asistencia registrada",
+        );
+      const source = getResource(b.resource_id),
+        target = getResource(op.resourceId);
+      if (!source || !target || !sameReservationService(source, target))
+        throw new Error(
+          "Elige un horario del mismo servicio; salud y psicología tienen agendas separadas",
+        );
+      if (source.id === target.id)
+        throw new Error("Elige un horario diferente");
+      if (Date.parse(`${target.date}T${target.time}:00-05:00`) <= Date.now())
+        throw new Error("El nuevo horario ya ha pasado");
+      const { n } = db
+        .prepare(
+          "SELECT count(*) n FROM bookings WHERE resource_id=? AND status NOT IN ('CANCELADA','NO_ASISTIO')",
+        )
+        .get(target.id) as { n: number };
+      if (n >= target.capacity)
+        throw new Error(
+          "No quedan cupos en el nuevo horario. Tu reserva original se conserva",
+        );
+      const conflict = db
+        .prepare(
+          "SELECT b.id FROM bookings b JOIN resources r ON r.id=b.resource_id WHERE b.user_id=? AND b.id<>? AND r.date=? AND abs((cast(substr(r.time,1,2) AS integer)*60+cast(substr(r.time,4,2) AS integer))-?)<60 AND b.status NOT IN ('CANCELADA','NO_ASISTIO','FINALIZADA','CONSUMIDA')",
+        )
+        .get(
+          actor.id,
+          b.id,
+          target.date,
+          Number(target.time.slice(0, 2)) * 60 + Number(target.time.slice(3)),
+        );
+      if (conflict)
+        throw new Error(
+          "Tienes otra reserva que coincide con el nuevo horario",
+        );
+      const ts = new Date().toISOString();
+      db.prepare(
+        "UPDATE bookings SET resource_id=?,token=?,updated_at=? WHERE id=?",
+      ).run(target.id, randomBytes(20).toString("hex"), ts, b.id);
+      db.prepare("DELETE FROM gym_credentials WHERE booking_id=?").run(b.id);
+      db.prepare("INSERT INTO booking_changes VALUES(?,?,?,?,?,?)").run(
+        op.requestId,
+        b.id,
+        actor.id,
+        source.id,
+        target.id,
+        ts,
+      );
+      audit(actor, "reschedule", b.id);
+      return getBooking(b.id);
+    }
     if (op.action === "quality") {
       if (!canOperate(actor, "quality"))
         throw new Error("No tienes permiso para gestionar calidad");
@@ -134,6 +206,8 @@ export function operate(actor: Actor, input: unknown) {
     const b = getBooking(op.bookingId);
     if (!b) throw new Error("Reserva no encontrada");
     const r = getResource(b.resource_id)!;
+    if (r.kind === "gym" && op.action !== "cancel")
+      throw new Error("Usa el control de acceso con QR temporal del gimnasio");
     if (op.action === "cancel") {
       if (b.user_id !== actor.id && !canOperateResource(actor, r))
         throw new Error("Reserva no autorizada");

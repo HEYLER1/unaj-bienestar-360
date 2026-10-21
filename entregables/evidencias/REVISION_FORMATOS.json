@@ -1,0 +1,12 @@
+{
+  "manual_paginas": 23,
+  "informe_paginas": 17,
+  "diapositivas": 15,
+  "notas": 15,
+  "capturas": 25,
+  "revision_visual": "Todas las páginas y diapositivas inspeccionadas; títulos y tablas corregidos.",
+  "paquete_pptx_integridad": "pass",
+  "tabla_nativa_slide": 10,
+  "importacion_pptx": true,
+  "formato_documentos": "APA 7"
+}

@@ -22,9 +22,16 @@ CREATE TABLE IF NOT EXISTS login_attempts(key TEXT PRIMARY KEY,count INTEGER NOT
 CREATE TABLE IF NOT EXISTS resources(id TEXT PRIMARY KEY,kind TEXT NOT NULL,title TEXT NOT NULL,description TEXT NOT NULL,date TEXT NOT NULL,time TEXT NOT NULL,capacity INTEGER NOT NULL CHECK(capacity>0),location TEXT NOT NULL,staff TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS bookings(id TEXT PRIMARY KEY,resource_id TEXT NOT NULL REFERENCES resources(id),user_id TEXT NOT NULL REFERENCES users(id),status TEXT NOT NULL,token TEXT NOT NULL UNIQUE,created_at TEXT NOT NULL,updated_at TEXT NOT NULL,request_id TEXT UNIQUE NOT NULL);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_active_booking ON bookings(resource_id,user_id) WHERE status NOT IN ('CANCELADA','NO_ASISTIO');
+CREATE TABLE IF NOT EXISTS booking_changes(request_id TEXT PRIMARY KEY,booking_id TEXT NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,user_id TEXT NOT NULL REFERENCES users(id),from_resource TEXT NOT NULL REFERENCES resources(id),to_resource TEXT NOT NULL REFERENCES resources(id),created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS audit_logs(id TEXT PRIMARY KEY,actor_id TEXT NOT NULL,action TEXT NOT NULL,resource_id TEXT NOT NULL,created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS quality_actions(id TEXT PRIMARY KEY,title TEXT NOT NULL,description TEXT NOT NULL,owner TEXT NOT NULL,due TEXT NOT NULL,status TEXT NOT NULL,evidence TEXT NOT NULL DEFAULT '',created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS quality_action_history(id TEXT PRIMARY KEY,quality_id TEXT NOT NULL REFERENCES quality_actions(id),actor_id TEXT NOT NULL REFERENCES users(id),status TEXT NOT NULL,evidence TEXT NOT NULL,created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS gym_settings(id INTEGER PRIMARY KEY CHECK(id=1),capacity INTEGER NOT NULL CHECK(capacity>0));
+INSERT OR IGNORE INTO gym_settings VALUES(1,20);
+CREATE TABLE IF NOT EXISTS gym_credentials(token_hash TEXT PRIMARY KEY,booking_id TEXT NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS gym_visits(id TEXT PRIMARY KEY,booking_id TEXT NOT NULL UNIQUE REFERENCES bookings(id) ON DELETE CASCADE,user_id TEXT NOT NULL REFERENCES users(id),entered_at TEXT NOT NULL,exited_at TEXT);
+CREATE UNIQUE INDEX IF NOT EXISTS gym_one_active_visit ON gym_visits(user_id) WHERE exited_at IS NULL;
+CREATE TABLE IF NOT EXISTS gym_events(id TEXT PRIMARY KEY,booking_id TEXT NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,actor_id TEXT NOT NULL REFERENCES users(id),direction TEXT NOT NULL CHECK(direction IN ('entry','exit')),created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS waste_records(id TEXT PRIMARY KEY,prepared INTEGER NOT NULL,delivered INTEGER NOT NULL,recoverable REAL NOT NULL,waste REAL NOT NULL,created_at TEXT NOT NULL);
 `);
     seedDatabase();

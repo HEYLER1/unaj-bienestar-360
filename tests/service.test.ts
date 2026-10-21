@@ -80,14 +80,14 @@ describe("reservas transaccionales y permisos", () => {
       operate(admin, { action: "consume", bookingId: b.id, token: b.token }),
     ).toThrow("Transición");
   });
-  it("recorre cola e ingreso/salida sin saltos", () => {
-    const b = reserve(student, "gym-1");
-    db.prepare("UPDATE resources SET date=? WHERE id='gym-1'").run(
+  it("recorre la cola administrativa de campaña sin saltos", () => {
+    const b = reserve(student, "camp-1");
+    db.prepare("UPDATE resources SET date=? WHERE id='camp-1'").run(
       new Date().toLocaleDateString("en-CA", { timeZone: "America/Lima" }),
     );
     operate(admin, { action: "checkin", bookingId: b.id, token: b.token });
     operate(admin, { action: "call", bookingId: b.id });
-    operate(admin, { action: "exit", bookingId: b.id });
+    operate(admin, { action: "finish", bookingId: b.id });
     expect(getBooking(b.id)?.status).toBe("FINALIZADA");
     const logs = db
       .prepare("SELECT count(*) n FROM audit_logs WHERE resource_id=?")

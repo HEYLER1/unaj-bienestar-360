@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "27c5d97",
+  "date": "18 de octubre de 2026",
+  "unitTests": 12,
+  "e2eTests": 7,
+  "screenshots": 25,
+  "fixtureResources": [
+    "camp-1",
+    "food-1",
+    "gym-1"
+  ],
+  "originalCodeModified": false
+}

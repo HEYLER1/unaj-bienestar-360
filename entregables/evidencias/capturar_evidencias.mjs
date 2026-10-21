@@ -1,0 +1,44 @@
+import {chromium} from '@playwright/test';
+import fs from 'node:fs/promises';
+import {DatabaseSync} from 'node:sqlite';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const base=process.env.DEMO_BASE_URL??'http://127.0.0.1:3200',out=path.dirname(fileURLToPath(import.meta.url));
+const fixturePath=process.env.DEMO_DB;
+if(!fixturePath||!path.basename(fixturePath).startsWith('evidencia'))throw new Error('DEMO_DB debe indicar una base ficticia nueva cuyo archivo comience por evidencia');
+const browser=await chromium.launch();
+const context=await browser.newContext({viewport:{width:1280,height:850},reducedMotion:'reduce'});const page=await context.newPage();page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(30000);
+const screenshots=[];
+async function snap(id,label){await page.waitForTimeout(150);await page.screenshot({path:`${out}/capturas/${id}.png`});console.log(id);screenshots.push({id,label,file:`capturas/${id}.png`});}
+async function side(label){await page.getByRole('navigation',{name:'Menú lateral'}).getByRole('button',{name:label==='Mis reservas'?/^Mis reservas/:label,exact:label!=='Mis reservas'}).click()}
+async function login(email){await page.goto(base);await page.getByLabel('Correo electrónico').fill(email);await page.getByLabel('Contraseña',{exact:true}).fill('Demo360!2026');await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click();await page.getByRole('heading',{name:/Hola,/}).waitFor()}
+async function logout(){await page.getByRole('button',{name:'Cerrar sesión'}).click();await page.getByRole('button',{name:'Iniciar sesión',exact:true}).waitFor()}
+async function reserve(label,index=0){await side('Servicios');await page.getByRole('button',{name:label==='Mis reservas'?/^Mis reservas/:label,exact:label!=='Mis reservas'}).click();await page.getByRole('button',{name:'Reservar mi lugar'}).nth(index).click();await page.getByRole('button',{name:'Confirmar reserva',exact:true}).click();await page.getByRole('status').filter({hasText:'confirmada'}).waitFor()}
+await page.goto(base);await page.getByRole('button',{name:'Iniciar sesión',exact:true}).waitFor();await snap('01-acceso','Acceso con cuentas ficticias');
+await login('estudiante@demo.local');await snap('02-inicio','Inicio estudiantil y navegación simplificada');
+await side('Servicios');await snap('03-servicios','Catálogo de seis servicios');
+await page.getByRole('button',{name:'Salud y psicología',exact:true}).click();await snap('04-horarios-salud','Horarios y cupos de salud');
+await page.getByRole('button',{name:'Reservar mi lugar'}).first().click();await snap('05-confirmacion','Confirmación de una cita ficticia');await page.getByRole('button',{name:'Confirmar reserva',exact:true}).click();await side('Mis reservas');await snap('06-reservas','Reserva confirmada persistente');
+await page.getByRole('button',{name:'Ver código',exact:true}).first().click();await page.getByRole('img',{name:'Código QR privado de esta reserva'}).waitFor();await snap('07-qr','QR generado localmente');await page.getByRole('button',{name:'Cerrar diálogo'}).click();
+await side('Inicio');await side('Mis reservas');await page.getByRole('button',{name:'Cancelar',exact:true}).first().click();await page.getByRole('button',{name:'Confirmar cancelación'}).click();await snap('08-cancelacion','Cancelación y liberación del cupo');
+await reserve('Campañas de salud');await snap('09-campana','Inscripción con cupo de campaña');
+await reserve('Comedor universitario');await snap('10-comedor','Menú y reserva de almuerzo');
+await reserve('Gimnasio');await snap('11-gimnasio','Reserva de franja de gimnasio');
+await reserve('Servicio social');await snap('12-social','Orientación social sin expediente');
+const studentState=await (await context.request.get(base+'/api/state')).json();await fs.writeFile(out+'/estado-estudiante.json',JSON.stringify(studentState,null,2));
+const fixture=new DatabaseSync(fixturePath);const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Lima'});fixture.prepare("UPDATE resources SET date=? WHERE id IN ('camp-1','food-1','gym-1')").run(today);fixture.close();
+await logout();await login('gestion@demo.local');
+async function arrival(label,resourceId){await side(label);const b=studentState.bookings.find(b=>b.resource_id===resourceId);page.once('dialog',d=>d.accept(b.token));await page.getByRole('button',{name:resourceId==='food-1'?'Entregar ración':'Registrar llegada',exact:true}).click();await page.getByRole('status').filter({hasText:'Asistencia registrada'}).waitFor()}
+await arrival('Campañas de salud','camp-1');await snap('13-campana-espera','Registro de llegada y espera general');await page.getByRole('button',{name:'Llamar turno',exact:true}).click();await snap('14-campana-atencion','Llamada del turno y atención administrativa');await page.getByRole('button',{name:'Finalizar',exact:true}).click();await snap('15-campana-finalizada','Campaña finalizada sin estaciones clínicas');
+await arrival('Comedor universitario','food-1');await snap('16-racion-entregada','Entrega única de ración por código');
+await page.getByLabel('Raciones preparadas',{exact:true}).fill('20');await page.getByLabel('Raciones entregadas',{exact:true}).fill('18');await page.getByLabel('Sobrantes aprovechables (kg)',{exact:true}).fill('1.2');await page.getByLabel('Residuos alimentarios (kg)',{exact:true}).fill('0.4');await page.getByRole('button',{name:'Guardar registro',exact:true}).click();await page.getByRole('heading',{name:'Producción y desperdicio'}).scrollIntoViewIfNeeded();await snap('17-produccion','Producción y residuos ficticios registrados manualmente');
+await arrival('Gimnasio','gym-1');await page.getByRole('button',{name:'Llamar turno',exact:true}).click();await page.getByRole('button',{name:'Finalizar',exact:true}).click();await snap('18-gimnasio-salida','Finalización administrativa del turno de gimnasio');
+await side('Gestión de calidad');await page.getByRole('button',{name:'Nueva acción',exact:true}).click();await page.getByLabel('Título',{exact:true}).fill('Revisar instrucciones de llegada a campaña');await page.getByLabel('Problema y acción propuesta').fill('Caso ficticio de demostración. Revisar las instrucciones de llegada y documentar una propuesta para prevenir confusiones. No representa una incidencia observada en la UNAJ.');await page.getByLabel('Responsable',{exact:true}).fill('Responsable de calidad · Demo');await page.getByLabel('Fecha límite').fill('2026-11-30');await snap('19-calidad-formulario','Creación de acción correctiva ficticia');await page.getByRole('button',{name:'Guardar acción',exact:true}).click();
+const card=()=>page.getByRole('article').filter({has:page.getByRole('heading',{name:'Revisar instrucciones de llegada a campaña'})});await card().getByLabel('Evidencia de ejecución').fill('Evidencia ficticia: se redactó una propuesta de instrucciones para la llegada. No se distribuyó a estudiantes reales.');await card().getByRole('button',{name:'Enviar a verificación'}).click();await snap('20-calidad-verificacion','Acción en verificación con evidencia de ejecución');await card().getByLabel('Evidencia de eficacia').fill('Simulación académica: se comprobó el paso por verificación y cierre. Este texto no acredita reducción de esperas ni eficacia en población real.');await card().getByRole('button',{name:'Verificar eficacia y cerrar'}).click();await snap('21-calidad-cierre','Cierre del flujo con evidencia simulada');
+await side('Indicadores y reportes');await snap('22-indicadores','Conteos administrativos del escenario ficticio');const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Exportar datos'}).click();const dl=await downloadPromise;await dl.saveAs(out+'/reporte-demo-bienestar.csv');
+const adminState=await (await context.request.get(base+'/api/state')).json();await fs.writeFile(out+'/estado-gestion.json',JSON.stringify(adminState,null,2));
+await logout();await login('tecnico@demo.local');await side('Gestión de calidad');await snap('23-acceso-restringido','Técnico sin permiso para gestionar calidad');
+await logout();await login('estudiante@demo.local');await page.setViewportSize({width:390,height:844});await snap('24-movil','Inicio móvil con accesos inferiores');await page.getByRole('button',{name:'Cambiar tema'}).click();await snap('25-oscuro','Modo oscuro móvil');
+await fs.writeFile(out+'/capturas/indice.json',JSON.stringify(screenshots,null,2));
+console.log(JSON.stringify({screenshots:screenshots.length,bookings:adminState.bookings.length,completed:adminState.bookings.filter(b=>['FINALIZADA','CONSUMIDA'].includes(b.status)).length,fixture:today},null,2));
+await browser.close();

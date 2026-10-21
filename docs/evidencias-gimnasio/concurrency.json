@@ -1,0 +1,10 @@
+{
+  "simultaneousRequests": 2,
+  "capacity": 1,
+  "httpStatuses": [
+    200,
+    400
+  ],
+  "inside": 1,
+  "verified": "No sobrecupo en dos peticiones concurrentes HTTP sobre un servidor SQLite local"
+}

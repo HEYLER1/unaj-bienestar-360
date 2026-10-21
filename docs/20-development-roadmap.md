@@ -21,3 +21,11 @@ Cada tarea requiere requisitos, UI, lógica, persistencia, validación, permisos
 Próximo incremento: separar repositorios por dominio; ejecutar Supabase local y conectar Auth; reemplazar roles fijos por permisos; implementar agendas y reprogramación atómica. Después motor de estaciones y escaneo por cámara.
 
 Decisiones bloqueantes para producción: políticas institucionales, acceso sanitario por profesional, elegibilidad, conservación, base legal y autorización de integración. Ninguna bloquea la demostración ficticia local.
+
+## Avance del gimnasio · 20 de octubre de 2026
+
+Implementado localmente: pase temporal de 60 segundos y un uso, validación de reserva/horario/rol, entrada y salida transaccionales, aforo de registros, historial reciente y panel adaptable. Cámara mediante BarcodeDetector cuando el navegador lo admite, con alternativa por texto. Hardware y lectura con cámara física aún no verificados. La fase 8 continúa parcial: no hay sensores, agendas configurables, reconciliación física ni métricas históricas. Se añadió creación de sesiones futuras sin solapamientos; la edición y eliminación de sesiones siguen pendientes. Ver `21-gym-qr-access.md`.
+
+## Reservas operativas y reprogramación · 20 de octubre de 2026
+
+El usuario aclaró que quiere una aplicación de uso real y reprogramar su propia reserva. Se implementaron reprogramación atómica, publicación de horarios de salud y psicología, confirmación con pase y nueva fecha/hora e invalidación del código anterior. No equivale a preparación para producción: siguen pendientes cuentas propias, sustitución de datos precargados, infraestructura de producción y hardware físico. Ver `22-rescheduling-and-attention.md`.

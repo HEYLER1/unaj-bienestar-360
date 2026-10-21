@@ -1,0 +1,18 @@
+{
+  "fecha": "2026-10-18",
+  "zona": "America/Lima",
+  "unitarias_integracion": {
+    "aprobadas": 12
+  },
+  "e2e": {
+    "aprobadas": 7
+  },
+  "typecheck": "correcto",
+  "lint": "correcto",
+  "build_webpack": "correcto",
+  "capturas": 25,
+  "codigo_original_modificado": false,
+  "datos": "exclusivamente ficticios",
+  "reservas_visibles_gestion": 5,
+  "atenciones_completas": 3
+}
